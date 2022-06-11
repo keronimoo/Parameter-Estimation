@@ -1,0 +1,55 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
+#a)MoM and MLE Estimation
+X = [0.3, 0.6, 0.8, 0.9] #given samples
+def f(x):   #given pdf with thete = 2.4
+    return 11.52/x**3
+
+def f_inverse(x): #inverse of cdf of given pdf
+    return np.sqrt(5.76/(1-x))
+
+def MoM(x): #Maximum Likelihood Estimation
+    estimated_theta = np.mean(x)/2 # divide mean of sampleset by 2 --> for calculations check report
+    return estimated_theta
+
+def MLE(x): #Method of Moments
+    estimated_theta = np.amin(x) #minimum of sampleset --> for calculations check report
+    return estimated_theta
+print("MoM estimate for the sample is",MoM(X)) # MoM esimation for given sample set X
+print("MLE estimate for the sample is",MLE(X)) #MLE estimation for given sample set X
+
+# b)Population Generation
+P = [] #array to append generated samples using inverse transformation method
+for j in range(10000000):
+    u= np.random.rand()
+    x=f_inverse(u)
+    P.append(x)
+
+
+# c)Experiment Simulation
+def experiment(P , N):
+    arrx = [] #for MoM
+    arry = [] # for MLE
+    for j in range(N):
+        indices = np.random.randint(0, 10000000, k) # generating random indices
+        i = 0
+        sampleset = []
+        while(i < len(indices)):
+            b = (P[indices[i]]) # take sample from generated population by passing random indices to P array
+            sampleset.append(b) #append samples taken from P to sampleset sample size = k
+            i = i + 1
+        arrx.append(MoM(sampleset))
+        arry.append(MLE(sampleset))
+
+    print("For N = ", k)
+    print("MoM estimate mean" , np.mean(arrx) , "MoM estimate std" , np.std(arrx))
+    print("MLE estimate mean" , np.mean(arry) , "MLE estimate std" , np.std(arry))
+    plt.figure()
+    plt.hist(arry, bins=np.linspace(0, 4.8, 100), density=True, label=f"MLE estimate histogram for N = {k}", alpha=0.5)
+    plt.hist(arrx , bins=np.linspace(0,4.8,100) , density=True , label=f"MoM estimate histogram for N = {k}" , alpha = 0.5)
+    plt.legend()
+    plt.show()
+
+for k in  [1,2,3,4,5,10,50,100,500,1000]: #Call the implemented function for N = [1,2,3,4,5,10,50,100,500,1000
+    experiment(P , 100000)
